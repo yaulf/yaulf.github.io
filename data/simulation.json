@@ -16,7 +16,7 @@
         "contributors": [
             "LF YAU"
         ],
-        "simulationUrl": "simulations/ICT/bubble-sort.html",
+        "simulationUrl": "simulations/ICT/bubble-sort.jsx",
         "screenshotUrl": "screenshots/bubble-sort.png",
         "createdAt": "2025-12-28",
         "updatedAt": "2025-12-28"
@@ -38,7 +38,7 @@
         "contributors": [
             "LF YAU"
         ],
-        "simulationUrl": "simulations/CL/input-output.html",
+        "simulationUrl": "simulations/CL/input-output.jsx",
         "screenshotUrl": "screenshots/input-output.png",
         "createdAt": "2025-12-28",
         "updatedAt": "2025-12-28"
