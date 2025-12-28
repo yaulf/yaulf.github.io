@@ -362,7 +362,8 @@
                                 feedback === 'wrong' ? 'bg-red-100 text-red-800 scale-100 opacity-100' : 
                                 'scale-90 opacity-0 pointer-events-none'
                             }`}>
-                                {feedback === 'correct' ? <span className="flex items-center gap-2"><Icon name="check" size={18}/> Great Job!</span> : <span className="flex items-center gap-2"><Icon name="x" size={18}/> Incorrect</span>}
+                                {feedback === 'correct' && <span className="flex items-center gap-2"><Icon name="check" size={18}/> Great Job!</span>}
+                                {feedback === 'wrong' && <span className="flex items-center gap-2"><Icon name="x" size={18}/> Incorrect</span>}
                             </div>
                         </div>
 

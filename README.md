@@ -13,9 +13,6 @@ The simulations are organized by subject:
 
 ## Usage
 
-Here is our production website:
-https://yaulf.github.io
-
 
 ## Contributing
 
@@ -23,4 +20,3 @@ https://yaulf.github.io
 
 ## License
 
-This project is licensed under the **YAU L.F.** .
