@@ -22,6 +22,28 @@
         "updatedAt": "2025-12-28"
     },
     {
+        "id": "selectsort",
+        "category": {
+            "en-US": "ICT",
+            "zh-HK": "資訊及通訊科技"
+        },
+        "title": {
+            "en-US": "Selection Sort",
+            "zh-HK": "選擇排序"
+        },
+        "description": {
+            "en-US": "A simulation of selection sort.",
+            "zh-HK": "選擇排序"
+        },
+        "contributors": [
+            "LF YAU"
+        ],
+        "simulationUrl": "simulations/ICT/selection-sort.html",
+        "screenshotUrl": "screenshots/selection-sort.png",
+        "createdAt": "2025-12-28",
+        "updatedAt": "2025-12-28"
+    },
+    {
         "id": "inputoutput",
         "category": {
             "en-US": "CL",
