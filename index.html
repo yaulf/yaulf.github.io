@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valtorta College</title>
+  <title>Physics Simulations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -95,9 +95,11 @@
     <h1
       class="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 tracking-tight"
       data-i18n="siteTitle">
-      Valtorta College
+      Physics Sim
     </h1>
-
+    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 font-light" data-i18n="siteTagline">
+      Interactive simulations for exploring the physical world.
+    </p>
 
     <!-- Search Bar -->
     <div class="max-w-md mx-auto relative group">
@@ -122,6 +124,13 @@
     <!-- Categories will be injected here -->
   </main>
 
+  <!-- Footer -->
+  <footer class="py-8 text-center text-slate-600 text-sm relative z-10">
+    <p><a href="https://github.com/harrycslau/physics-simulations/" target="_blank"
+        class="text-blue-400 hover:text-blue-300 transition-colors">Open Source</a> Physics Simulations for
+      Education. Created with 🩵
+      by Hong Kong Physics Teachers. Copyright © 2025.</p>
+  </footer>
 
   <script>
     // --- Configuration ---
@@ -129,11 +138,12 @@
 
     // Category Order (as requested)
     const CATEGORY_ORDER = [
-          "ICT": "ICT",
-          "CL": "CL",
-          "Others": "Others"
+      "ICT",
+      "CL",
+      "Others",
     ];
 
+    // i18n Configuration
     const i18n = {
       'en-US': {
         siteTitle: "Valtorta College",
@@ -143,7 +153,7 @@
         categories: {
           "ICT": "ICT",
           "CL": "CL",
-          "Others": "Others"
+          "Others": "Others",
         },
         contributors: "Contributors"
       },
