@@ -1,311 +1,458 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Keyboard, 
-  Monitor, 
-  Mouse, 
-  Printer, 
-  Mic, 
-  Speaker, 
-  Camera, 
-  Headset,
-  ScanBarcode,
-  Tablet,
-  ArrowLeftRight,
-  CheckCircle, 
-  XCircle, 
-  HelpCircle,
-  Trophy,
-  RefreshCw,
-  ArrowRight
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bubble Sort Interactive Game</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --panel:#0b1220;
+    --accent:#06b6d4;
+    --muted:#94a3b8;
+    --bar:#60a5fa;
+    --bar2:#fb7185;
+    --ok:#34d399;
+    --danger:#f97316;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,var(--bg),#071027);
+    color:#e6eef8;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .app{
+    width:100%;
+    max-width:1100px;
+    background:linear-gradient(180deg,var(--panel),#051225);
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(2,6,23,0.6);
+    padding:18px;
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .controls{
+    flex:1 1 320px;
+    min-width:260px;
+    padding:12px;
+    border-radius:10px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .visual{
+    flex:2 1 520px;
+    min-width:300px;
+    padding:12px;
+    border-radius:10px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex;
+    flex-direction:column;
+  }
+  h1{margin:0 0 6px 0;font-size:18px}
+  p.lead{margin:0 0 12px 0;color:var(--muted);font-size:13px}
+  .row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+  label{font-size:13px;color:var(--muted)}
+  input[type="range"]{width:100%}
+  .btn{
+    background:linear-gradient(180deg,var(--accent),#0288a6);
+    border:none;color:#012; padding:8px 12px;border-radius:8px;font-weight:600;
+    cursor:pointer;box-shadow:0 6px 18px rgba(3,105,125,0.18);
+  }
+  .btn.secondary{
+    background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none;font-weight:600;
+  }
+  .btn.danger{background:linear-gradient(180deg,var(--danger),#d04a00);color:#081018}
+  .small{padding:6px 8px;font-size:13px;border-radius:7px}
+  .info{
+    display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;
+  }
+  .chip{
+    background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid rgba(255,255,255,0.02);
+  }
+  .canvas{
+    height:420px;
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    padding:12px;
+    border-radius:8px;
+    margin-top:12px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));
+    position:relative;
+    overflow:hidden;
+  }
+  .bar{
+    flex:1 0 auto;
+    height:40%;
+    background:linear-gradient(180deg,var(--bar),#2563eb);
+    border-radius:6px 6px 4px 4px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:rgba(255,255,255,0.95);
+    font-weight:700;
+    letter-spacing:0.6px;
+    box-shadow:0 6px 18px rgba(2,6,23,0.5), inset 0 -6px 14px rgba(255,255,255,0.03);
+    transition:all 250ms ease;
+    position:relative;
+  }
+  .bar .label{
+    transform:translateY(6px);
+    font-size:12px;
+    color:rgba(255,255,255,0.9);
+  }
+  .bar.compare{outline:3px dashed rgba(255,255,255,0.12); transform:translateY(-6px)}
+  .bar.swapped{background:linear-gradient(180deg,var(--bar2),#ef4444)}
+  .bar.sorted{background:linear-gradient(180deg,var(--ok),#10b981); box-shadow:0 6px 18px rgba(16,185,129,0.12)}
+  .legend{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .legend-item{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+  .colorbox{width:18px;height:12px;border-radius:4px;background:var(--bar);border:1px solid rgba(255,255,255,0.03)}
+  .colorbox.swapped{background:var(--bar2)}
+  .colorbox.sorted{background:var(--ok)}
+  .footer{
+    margin-top:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .status{font-size:13px;color:var(--muted)}
+  .big{
+    font-size:22px;font-weight:700;color:#e6eef8;
+  }
+  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+  /* responsive */
+  @media (max-width:800px){
+    .canvas{height:300px}
+  }
+  @media (max-width:520px){
+    .app{padding:12px}
+    .controls,.visual{flex-basis:100%}
+    .canvas{height:260px}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Bubble sort interactive game">
+  <div class="controls" aria-hidden="false">
+    <h1>Bubble Sort — Interactive Game</h1>
+    <p class="lead">Visualize bubble sort by stepping through comparisons and swaps. Try different sizes and speeds.</p>
 
-/* ---------- Data ---------- */
-const DEVICES = [
-  { id: 'keyboard', name: 'Keyboard', type: 'Input', icon: <Keyboard size={120} strokeWidth={1} />, description: "Allows you to type letters, numbers, and commands into the computer.", question: "What is the primary function of this device?", options: ["To display video games","To enter alphanumeric data","To print documents on paper","To record high-quality sound"], correctOption: 1 },
-  { id: 'monitor', name: 'Monitor', type: 'Output', icon: <Monitor size={120} strokeWidth={1} />, description: "Displays the visual output from the computer's graphics card.", question: "Which statement best describes this device?", options: ["It processes data like a brain","It captures images from the room","It displays visual information to the user","It stores all your files permanently"], correctOption: 2 },
-  { id: 'mouse', name: 'Mouse', type: 'Input', icon: <Mouse size={120} strokeWidth={1} />, description: "A hand-held pointing device that detects two-dimensional motion relative to a surface.", question: "What is this device mainly used for?", options: ["Typing long essays","Controlling the on-screen cursor","Scanning physical photos","Cooling down the CPU"], correctOption: 1 },
-  { id: 'printer', name: 'Printer', type: 'Output', icon: <Printer size={120} strokeWidth={1} />, description: "Produces a hard copy (permanent human-readable text and/or graphics) of documents.", question: "What is the output of this device?", options: ["Digital video files","Physical paper documents","Audio waves","3D Holograms"], correctOption: 1 },
-  { id: 'mic', name: 'Microphone', type: 'Input', icon: <Mic size={120} strokeWidth={1} />, description: "Converts sound into an electrical signal.", question: "How does this device interact with the computer?", options: ["It captures audio from the environment","It projects sound into the room","It takes photos of the user","It allows you to listen to music"], correctOption: 0 },
-  { id: 'speaker', name: 'Speakers', type: 'Output', icon: <Speaker size={120} strokeWidth={1} />, description: "Converts electrical audio signals into corresponding sound.", question: "What is the primary purpose of this device?", options: ["To record your voice","To cool the computer system","To produce audible sound","To boost internet speed"], correctOption: 2 },
-  { id: 'webcam', name: 'Webcam', type: 'Input', icon: <Camera size={120} strokeWidth={1} />, description: "A video camera that feeds or streams an image or video in real time.", question: "What is this device used for during a meeting?", options: ["Hearing what others say","Typing messages in chat","Transmitting your video feed","Printing meeting notes"], correctOption: 2 },
-  { id: 'headset', name: 'Headset', type: 'Both', icon: <Headset size={120} strokeWidth={1} />, description: "Combines headphones with a microphone. Used for two-way communication like calls or gaming.", question: "Why is a Headset classified as 'Both'?", options: ["It blocks outside noise","It allows you to hear (Output) and speak (Input)","It connects via Bluetooth","It is smaller than speakers"], correctOption: 1 },
-  { id: 'touchscreen', name: 'Touchscreen', type: 'Both', icon: <Tablet size={120} strokeWidth={1} />, description: "An electronic visual display that the user can control through simple or multi-touch gestures.", question: "Why is a touchscreen considered both Input and Output?", options: ["It has a keyboard attached","It displays visual info AND accepts touch commands","It is wireless","It can print paper while you type"], correctOption: 1 },
-  { id: 'barcode', name: 'Barcode Reader', type: 'Input', icon: <ScanBarcode size={120} strokeWidth={1} />, description: "An optical scanner that reads printed barcodes, decodes the data, and sends it to a computer.", question: "What is the primary use of this device?", options: ["To print receipts","To scan and input product codes","To display prices on a screen","To generate QR codes"], correctOption: 1 }
-];
+    <div class="row">
+      <label for="size">Array size</label>
+      <input id="size" type="range" min="4" max="30" value="12" />
+      <div class="chip" id="sizeVal">12</div>
+    </div>
 
-/* ---------- Small UI components ---------- */
-const Card = ({ children, isSelected, isMatched, onClick, className = "" }) => {
-  return (
-    <button
-      type="button"
-      onClick={!isMatched ? onClick : undefined}
-      aria-pressed={isSelected}
-      disabled={isMatched}
-      className={`
-        relative flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-300 overflow-hidden text-left
-        ${isMatched ? 'bg-white/60 border-green-400 opacity-60 cursor-default' : isSelected ? 'bg-blue-50 border-blue-400 scale-105 shadow-lg ring-2 ring-blue-200' : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm'}
-        ${className}
-      `}
-    >
-      {isMatched && (
-        <span className="absolute top-3 right-3 text-green-600" aria-hidden>
-          <CheckCircle size={20} />
-        </span>
-      )}
-      {children}
-    </button>
-  );
-};
+    <div class="row">
+      <label for="speed">Speed (ms per step)</label>
+      <input id="speed" type="range" min="50" max="1200" step="10" value="300" />
+      <div class="chip" id="speedVal">300ms</div>
+    </div>
 
-const Modal = ({ isOpen, title, children, onClose }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
-        <div className="flex items-center justify-between bg-blue-600 text-white p-4">
-          <div className="flex items-center gap-2 font-bold text-lg">
-            <HelpCircle />
-            <span>{title}</span>
-          </div>
-          <button className="text-white/90" onClick={onClose} aria-label="Close dialog">✕</button>
+    <div class="row">
+      <button id="shuffleBtn" class="btn small">Shuffle</button>
+      <button id="nextBtn" class="btn secondary small">Next Step</button>
+      <button id="playBtn" class="btn small">Auto Play</button>
+      <button id="resetBtn" class="btn danger small">Reset</button>
+    </div>
+
+    <div class="row">
+      <div class="chip">Comparisons: <span id="comp">0</span></div>
+      <div class="chip">Swaps: <span id="swp">0</span></div>
+      <div class="chip">i (pass): <span id="pass">0</span></div>
+      <div class="chip">j (index): <span id="idx">0</span></div>
+    </div>
+
+    <div class="hint">
+      Tips:
+      <ul style="margin:6px 0 0 18px;color:var(--muted);padding:0">
+        <li>Bubble sort repeatedly compares neighbors and swaps if out of order.</li>
+        <li>After each full pass largest unsorted item moves to its correct place.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="visual">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="big" id="title">Bubble Sort</div>
+        <div class="status" id="status">Status: Ready</div>
+      </div>
+      <div style="text-align:right">
+        <div class="legend">
+          <div class="legend-item"><div class="colorbox"></div> Comparing</div>
+          <div class="legend-item"><div class="colorbox swapped"></div> Swapped</div>
+          <div class="legend-item"><div class="colorbox sorted"></div> Sorted</div>
         </div>
-        <div className="p-6">{children}</div>
       </div>
     </div>
-  );
-};
 
-/* ---------- Main App ---------- */
-export default function App() {
-  const [shuffledDevices, setShuffledDevices] = useState([]);
-  const [shuffledNames, setShuffledNames] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [selectedName, setSelectedName] = useState(null);
-  const [matchedIds, setMatchedIds] = useState(new Set());
-  const [score, setScore] = useState(0);
-  const [quizState, setQuizState] = useState({ isOpen: false, stage: 'classify', device: null, feedback: null });
-  const [gameComplete, setGameComplete] = useState(false);
+    <div class="canvas" id="canvas" aria-live="polite" aria-atomic="true"></div>
 
-  // init
-  const initGame = useCallback(() => {
-    const devicesCopy = [...DEVICES].sort(() => Math.random() - 0.5);
-    const namesCopy = [...DEVICES].map(d => ({ id: d.id, name: d.name })).sort(() => Math.random() - 0.5);
-    setShuffledDevices(devicesCopy);
-    setShuffledNames(namesCopy);
-    setMatchedIds(new Set());
-    setScore(0);
-    setSelectedDevice(null);
-    setSelectedName(null);
-    setQuizState({ isOpen: false, stage: 'classify', device: null, feedback: null });
-    setGameComplete(false);
-  }, []);
-
-  useEffect(() => { initGame(); }, [initGame]);
-
-  useEffect(() => {
-    if (matchedIds.size > 0 && matchedIds.size === DEVICES.length) {
-      setGameComplete(true);
-    }
-  }, [matchedIds]);
-
-  const selectDevice = (device) => {
-    if (matchedIds.has(device.id)) return;
-    const newSelection = selectedDevice === device.id ? null : device.id;
-    setSelectedDevice(newSelection);
-    // attempt match if name already selected
-    if (selectedName) {
-      attemptMatch(newSelection, selectedName);
-    }
-  };
-
-  const selectName = (nameItem) => {
-    if (matchedIds.has(nameItem.id)) return;
-    const newSelection = selectedName === nameItem.id ? null : nameItem.id;
-    setSelectedName(newSelection);
-    if (selectedDevice) {
-      attemptMatch(selectedDevice, newSelection);
-    }
-  };
-
-  const attemptMatch = (devId, nameId) => {
-    if (!devId || !nameId) return;
-    if (devId === nameId) {
-      // open modal for classify stage
-      const device = DEVICES.find(d => d.id === devId);
-      // award small immediate points for identifying a correct pair click
-      setScore(s => s + 10);
-      // show modal
-      setTimeout(() => {
-        setQuizState({ isOpen: true, stage: 'classify', device, feedback: null });
-      }, 250);
-    } else {
-      // shake feedback: deselect both after delay
-      setTimeout(() => {
-        setSelectedDevice(null);
-        setSelectedName(null);
-      }, 500);
-    }
-  };
-
-  const handleClassify = (choice) => {
-    const device = quizState.device;
-    if (!device) return;
-    const correct = device.type === choice;
-    if (correct) {
-      setScore(s => s + 15);
-      setQuizState(prev => ({ ...prev, stage: 'function', feedback: { type: 'success', msg: 'Correct classification!' } }));
-    } else {
-      setScore(s => Math.max(0, s - 5));
-      setQuizState(prev => ({ ...prev, feedback: { type: 'error', msg: 'Incorrect — try again.' } }));
-      setTimeout(() => setQuizState(prev => ({ ...prev, feedback: null })), 1400);
-    }
-  };
-
-  const handleFunctionAnswer = (idx) => {
-    const device = quizState.device;
-    if (!device) return;
-    const correct = idx === device.correctOption;
-    if (correct) {
-      setScore(s => s + 25);
-      // lock in matched pair
-      setMatchedIds(prev => new Set(prev).add(device.id));
-      // clear selections, close modal
-      setSelectedDevice(null);
-      setSelectedName(null);
-      setQuizState({ isOpen: false, stage: 'classify', device: null, feedback: null });
-    } else {
-      setScore(s => Math.max(0, s - 5));
-      setQuizState(prev => ({ ...prev, feedback: { type: 'error', msg: 'Incorrect function answer.' } }));
-      setTimeout(() => setQuizState(prev => ({ ...prev, feedback: null })), 1400);
-    }
-  };
-
-  const closeModal = () => {
-    setQuizState({ isOpen: false, stage: 'classify', device: null, feedback: null });
-    setSelectedDevice(null);
-    setSelectedName(null);
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-12">
-      <header className="bg-white shadow sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 p-2 rounded-lg text-white"><Monitor /></div>
-            <div>
-              <h1 className="text-lg font-bold">Valtorta College Input Output Master</h1>
-              <p className="text-xs text-slate-500">Tech Education Game</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-sm text-slate-500 text-right">
-              <div className="uppercase font-bold tracking-wide">Progress</div>
-              <div className="font-bold text-slate-700">{matchedIds.size} / {DEVICES.length} Pairs</div>
-            </div>
-            <div className="bg-slate-900 text-white px-4 py-2 rounded-full font-mono font-bold text-lg flex items-center gap-2">
-              <Trophy size={16} className="text-yellow-400" />
-              {score}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        {gameComplete ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
-            <div className="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Trophy size={48} />
-            </div>
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Excellent Work!</h2>
-            <p className="text-slate-600 mb-6 max-w-md mx-auto">You matched all devices and identified their functions correctly. You're a hardware expert!</p>
-            <div className="text-5xl font-bold text-blue-600 mb-6">{score} <span className="text-2xl text-slate-400">pts</span></div>
-            <button onClick={initGame} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold inline-flex items-center gap-2">
-              <RefreshCw />
-              Play Again
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left: Devices */}
-            <section>
-              <h3 className="text-sm font-semibold text-slate-500 uppercase mb-4 flex items-center gap-2">
-                <Camera size={14} />
-                Device Photos
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {shuffledDevices.map(device => (
-                  <Card key={device.id} isSelected={selectedDevice === device.id} isMatched={matchedIds.has(device.id)} onClick={() => selectDevice(device)} className="h-44">
-                    <div className={`transition-transform ${matchedIds.has(device.id) ? 'opacity-60' : 'hover:scale-105'}`}>
-                      {React.cloneElement(device.icon, { size: 92 })}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            {/* Right: Names */}
-            <section>
-              <h3 className="text-sm font-semibold text-slate-500 uppercase mb-4 flex items-center gap-2 justify-end">
-                <Keyboard size={14} />
-                <span>Device Names</span>
-              </h3>
-              <div className="space-y-3">
-                {shuffledNames.map(item => (
-                  <Card key={item.id} isSelected={selectedName === item.id} isMatched={matchedIds.has(item.id)} onClick={() => selectName(item)} className="h-16 flex items-center justify-between px-6">
-                    <span className={`font-bold text-lg ${matchedIds.has(item.id) ? 'line-through text-slate-400' : 'text-slate-700'}`}>{item.name}</span>
-                    {matchedIds.has(item.id) ? <CheckCircle size={18} className="text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-slate-200" />}
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </div>
-        )}
-      </main>
-
-      <Modal isOpen={quizState.isOpen} title={quizState.stage === 'classify' ? 'Classify Device' : 'Identify Function'} onClose={closeModal}>
-        {quizState.device && (
-          <div>
-            <div className="flex items-center gap-4 border-b pb-4 mb-4">
-              <div className="bg-blue-50 p-2 rounded">{React.cloneElement(quizState.device.icon, { size: 44 })}</div>
-              <div>
-                <div className="font-bold text-lg">{quizState.device.name}</div>
-                <div className="text-sm text-slate-500">Identify this component</div>
-              </div>
-            </div>
-
-            {quizState.feedback && (
-              <div className={`p-3 rounded mb-4 text-sm font-semibold ${quizState.feedback.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {quizState.feedback.msg}
-              </div>
-            )}
-
-            {quizState.stage === 'classify' && (
-              <>
-                <p className="mb-4 text-slate-700">Is this an Input, Output, or Both?</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <button onClick={() => handleClassify('Input')} className="p-3 rounded border hover:bg-blue-50">Input</button>
-                  <button onClick={() => handleClassify('Output')} className="p-3 rounded border hover:bg-purple-50">Output</button>
-                  <button onClick={() => handleClassify('Both')} className="p-3 rounded border hover:bg-orange-50">Both</button>
-                </div>
-              </>
-            )}
-
-            {quizState.stage === 'function' && (
-              <>
-                <p className="mb-4 text-slate-700">{quizState.device.question}</p>
-                <div className="space-y-3">
-                  {quizState.device.options.map((opt, idx) => (
-                    <button key={idx} onClick={() => handleFunctionAnswer(idx)} className="w-full p-3 text-left rounded border hover:bg-blue-50 flex items-center justify-between">
-                      <span>{opt}</span>
-                      <span className="w-4 h-4 rounded-full border-2 border-slate-200" />
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </Modal>
+    <div class="footer">
+      <div class="chip" id="explain">Explanation: Click Next or Auto Play to proceed.</div>
+      <div>
+        <button id="explainBtn" class="btn secondary small">Show Explanation</button>
+      </div>
     </div>
-  );
-}
+  </div>
+</div>
+
+<script>
+(function(){
+  // Utilities
+  const el = id => document.getElementById(id);
+  const canvas = el('canvas');
+  let arr = [];
+  let size = parseInt(el('size').value,10);
+  let speed = parseInt(el('speed').value,10);
+  let comparisons = 0;
+  let swaps = 0;
+  let iPass = 0; // current outer pass (0-based)
+  let jIdx = 0; // current inner index (0-based)
+  let playing = false;
+  let timer = null;
+  let sorted = false;
+
+  // DOM refs
+  const sizeVal = el('sizeVal');
+  const speedVal = el('speedVal');
+  const compEl = el('comp');
+  const swpEl = el('swp');
+  const passEl = el('pass');
+  const idxEl = el('idx');
+  const statusEl = el('status');
+  const explainEl = el('explain');
+  const explainBtn = el('explainBtn');
+
+  // Initialize
+  function initArray(n){
+    arr = [];
+    for(let k=0;k<n;k++){
+      arr.push(Math.floor(Math.random()*100)+5);
+    }
+    comparisons = 0;
+    swaps = 0;
+    iPass = 0;
+    jIdx = 0;
+    playing = false;
+    sorted = false;
+    updateStats();
+    render();
+    setStatus('Ready');
+  }
+
+  function updateStats(){
+    compEl.textContent = comparisons;
+    swpEl.textContent = swaps;
+    passEl.textContent = iPass;
+    idxEl.textContent = jIdx;
+    sizeVal.textContent = arr.length;
+    speedVal.textContent = speed + 'ms';
+  }
+
+  // Render bars
+  function render(highlight = {}) {
+    // highlight: { compare: [i,j], swapped: [i,j], sortedIndex: k }
+    canvas.innerHTML = '';
+    const n = arr.length;
+    const max = Math.max(...arr);
+    for(let k=0;k<n;k++){
+      const value = arr[k];
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      // width adapted; use flex basis with min width:
+      bar.style.flex = `1 0 calc(${100/n}% - 6px)`;
+      // height based on value
+      const pct = Math.max(6, Math.round((value / max) * 100));
+      bar.style.height = pct + '%';
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = value;
+      bar.appendChild(label);
+
+      if(highlight.compare && (highlight.compare[0]===k || highlight.compare[1]===k)){
+        bar.classList.add('compare');
+      }
+      if(highlight.swapped && (highlight.swapped[0]===k || highlight.swapped[1]===k)){
+        bar.classList.add('swapped');
+      }
+      if(typeof highlight.sortedFrom === 'number' && k >= highlight.sortedFrom){
+        bar.classList.add('sorted');
+      }
+      canvas.appendChild(bar);
+    }
+  }
+
+  // Bubble sort single step (one comparison, maybe swap)
+  // Returns an object with action info
+  function stepBubble() {
+    const n = arr.length;
+    if(sorted) return {done:true};
+
+    if(iPass >= n-1){
+      // fully sorted
+      sorted = true;
+      setStatus('Sorted — complete!');
+      render({sortedFrom:0});
+      return {done:true};
+    }
+
+    // If jIdx has reached end for this pass, finish pass
+    if(jIdx >= n - 1 - iPass){
+      // this pass finished; mark the last element as sorted portion
+      iPass += 1;
+      jIdx = 0;
+      updateStats();
+      setStatus(`Completed pass ${iPass} — largest ${iPass} element(s) in place`);
+      // Render to show sorted tail
+      render({sortedFrom: n - iPass});
+      // If after increment we've completed all passes:
+      if(iPass >= n-1){
+        sorted = true;
+        setStatus('Sorted — complete!');
+        render({sortedFrom:0});
+        return {done:true};
+      }
+      return {action:'passComplete'};
+    }
+
+    // Compare arr[jIdx] and arr[jIdx+1]
+    comparisons++;
+    let swapped = false;
+    if(arr[jIdx] > arr[jIdx+1]){
+      // swap
+      const tmp = arr[jIdx];
+      arr[jIdx] = arr[jIdx+1];
+      arr[jIdx+1] = tmp;
+      swaps++;
+      swapped = true;
+    }
+    // prepare highlight & increment j
+    const comparePair = [jIdx, jIdx+1];
+    const action = swapped ? 'swap' : 'compare';
+    // render showing comparison (and swap color)
+    render({compare: comparePair, swapped: swapped ? comparePair : null, sortedFrom: arr.length - iPass});
+    jIdx++;
+    updateStats();
+    setStatus(swapped ? `Swapped indices ${comparePair[0]} and ${comparePair[1]}` : `Compared indices ${comparePair[0]} and ${comparePair[1]}`);
+    // after this comparison, if jIdx reached end, next call will finish pass
+    return {action, comparePair, swapped};
+  }
+
+  // Controls
+  function nextStep(){
+    if(sorted) {
+      setStatus('Already sorted — Reset or Shuffle to try again.');
+      return;
+    }
+    const res = stepBubble();
+    // If the step produced a swap highlight, keep it visible a bit
+    // (render already called inside stepBubble)
+  }
+
+  function autoPlayStart(){
+    if(sorted){ setStatus('Already sorted — Reset or Shuffle to try again.'); return;}
+    if(playing) return;
+    playing = true;
+    el('playBtn').textContent = 'Pause';
+    setStatus('Auto playing...');
+    timer = setInterval(()=>{
+      if(!playing) return;
+      nextStep();
+      if(sorted){
+        autoPlayStop();
+        return;
+      }
+    }, speed);
+  }
+  function autoPlayStop(){
+    playing = false;
+    el('playBtn').textContent = 'Auto Play';
+    if(timer){ clearInterval(timer); timer = null; }
+    setStatus(sorted ? 'Sorted — complete!' : 'Paused');
+  }
+
+  function shuffle(){
+    // Fisher-Yates shuffle on new random array
+    initArray(arr.length);
+  }
+
+  function reset(){
+    initArray(size);
+  }
+
+  function setStatus(text){
+    statusEl.textContent = 'Status: ' + text;
+    explainEl.textContent = text;
+  }
+
+  // Event wiring
+  el('size').addEventListener('input', (e)=>{
+    size = parseInt(e.target.value,10);
+    el('sizeVal').textContent = size;
+  });
+  el('size').addEventListener('change', (e)=>{
+    size = parseInt(e.target.value,10);
+    initArray(size);
+  });
+  el('speed').addEventListener('input', (e)=>{
+    speed = parseInt(e.target.value,10);
+    speedVal.textContent = speed + 'ms';
+    if(playing){
+      // restart timer with new speed
+      autoPlayStop();
+      autoPlayStart();
+    }
+  });
+
+  el('shuffleBtn').addEventListener('click', ()=>{
+    shuffle();
+  });
+  el('resetBtn').addEventListener('click', ()=>{
+    reset();
+  });
+  el('nextBtn').addEventListener('click', ()=>{
+    nextStep();
+  });
+  el('playBtn').addEventListener('click', ()=>{
+    if(playing) autoPlayStop(); else autoPlayStart();
+  });
+  explainBtn.addEventListener('click', ()=>{
+    explainEl.textContent = `Step explanation: i (pass) = ${iPass}. j (index) = ${Math.max(0,jIdx-1)}. On each comparison we compare neighbors and swap if left > right. After each pass the largest unsorted item "bubbles" to the end.`;
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown',(e)=>{
+    if(e.key === ' '){
+      e.preventDefault();
+      if(playing) autoPlayStop(); else autoPlayStart();
+    } else if(e.key === 'ArrowRight'){
+      nextStep();
+    } else if(e.key === 'r' || e.key === 'R'){
+      reset();
+    } else if(e.key === 's' || e.key === 'S'){
+      shuffle();
+    }
+  });
+
+  // Initialize first time
+  initArray(size);
+
+  // Accessibility: describe initial instructions if screen reader
+  el('canvas').setAttribute('aria-label','Bars representing array values. Use Next Step or Auto Play to progress bubble sort.');
+
+})();
+</script>
+</body>
+</html>
