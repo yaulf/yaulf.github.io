@@ -60,8 +60,8 @@
         "contributors": [
             "LF YAU"
         ],
-        "simulationUrl": "simulations/ICT/selection-sort.html",
-        "screenshotUrl": "screenshots/selection-sort.png",
+        "simulationUrl": "simulations/ICT/insertion-sort.html",
+        "screenshotUrl": "screenshots/insertion-sort.png",
         "createdAt": "2025-12-29",
         "updatedAt": "2025-12-29"
     },
