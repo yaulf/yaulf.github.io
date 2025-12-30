@@ -3,12 +3,15 @@
         "id": "bubblesort",
         "category": {
             "en-US": "ICT",
+            "zh-HK": "資訊及通訊科技"
         },
         "title": {
             "en-US": "Bubble Sort",
+            "zh-HK": "冒泡排序"
         },
         "description": {
             "en-US": "A simulation of bubble sort.",
+            "zh-HK": "冒泡排序"
         },
         "contributors": [
             "LF YAU"
@@ -22,12 +25,15 @@
         "id": "selectsort",
         "category": {
             "en-US": "ICT",
+            "zh-HK": "資訊及通訊科技"
         },
         "title": {
             "en-US": "Selection Sort",
+            "zh-HK": "選擇排序"
         },
         "description": {
             "en-US": "A simulation of selection sort.",
+            "zh-HK": "選擇排序"
         },
         "contributors": [
             "LF YAU"
@@ -41,12 +47,15 @@
         "id": "selectsort",
         "category": {
             "en-US": "ICT",
+            "zh-HK": "資訊及通訊科技"
         },
         "title": {
             "en-US": "Insertion Sort",
+            "zh-HK": "Insertion Sort"
         },
         "description": {
             "en-US": "A simulation of insertion sort.",
+            "zh-HK": "insertion Sort"
         },
         "contributors": [
             "LF YAU"
@@ -60,12 +69,15 @@
         "id": "inputoutput",
         "category": {
             "en-US": "CL",
+            "zh-HK": "初中 資訊和通訊科技"
         },
         "title": {
             "en-US": "input / output devices",
+            "zh-HK": "輸入／輸出"
         },
         "description": {
             "en-US": "input / output devices",
+            "zh-HK": "輸入／輸出"
         },
         "contributors": [
             "LF YAU"
